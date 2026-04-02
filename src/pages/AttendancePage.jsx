@@ -22,6 +22,7 @@ const AttendancePage = () => {
   const [students, setStudents] = useState([]);
   const [attendance, setAttendance] = useState({}); // { studentId: { status, reason } }
   const [trainingInfo, setTrainingInfo] = useState(null);
+  const [attendanceDate, setAttendanceDate] = useState(new Date().toISOString().split('T')[0]);
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState('');
@@ -29,9 +30,10 @@ const AttendancePage = () => {
 
   useEffect(() => {
     const fetchData = async () => {
+      setLoading(true);
       try {
         const [attRes, trRes] = await Promise.all([
-          api.get(`/attendance/training/${trainingId}`),
+          api.get(`/attendance/training/${trainingId}?date=${attendanceDate}`),
           api.get(`/trainings`),
         ]);
         setStudents(attRes.data);
@@ -54,8 +56,8 @@ const AttendancePage = () => {
         setLoading(false);
       }
     };
-    fetchData();
-  }, [trainingId]);
+    if (attendanceDate) fetchData();
+  }, [trainingId, attendanceDate]);
 
   const setStatus = (studentId, status) => {
     setAttendance(prev => ({
@@ -77,6 +79,7 @@ const AttendancePage = () => {
         .map(s => api.post('/attendance', {
           studentId: s.studentId,
           trainingId,
+          date: attendanceDate,
           status: attendance[s.studentId].status,
           reason: attendance[s.studentId].reason || '',
         }));
@@ -107,9 +110,18 @@ const AttendancePage = () => {
             {t('attendanceTitle')} — <span className="gradient-text">{trainingInfo?.section?.name || '...'}</span>
           </h1>
           {trainingInfo && (
-            <p style={{ color: 'var(--text-muted)', fontSize: '0.9rem' }}>
-              {trainingInfo.date} {t('at')} {trainingInfo.time} · {t('trainer')}: {trainingInfo.trainer?.name}
-            </p>
+            <>
+              <p style={{ color: 'var(--text-muted)', fontSize: '0.9rem', marginBottom: '0.5rem' }}>
+                {trainingInfo.days?.map(d => t(d)).join(', ')} {t('at')} {trainingInfo.time} · {t('trainer')}: {trainingInfo.trainer?.name}
+              </p>
+              <input 
+                type="date" 
+                className="form-input" 
+                value={attendanceDate} 
+                onChange={e => setAttendanceDate(e.target.value)} 
+                style={{ padding: '0.4rem 0.8rem', fontSize: '0.9rem', width: 'auto', background: 'rgba(255,255,255,0.05)', color: 'white', border: '1px solid rgba(255,255,255,0.2)' }}
+              />
+            </>
           )}
         </div>
       </div>

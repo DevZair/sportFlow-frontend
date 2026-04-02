@@ -20,11 +20,14 @@ const Dashboard = () => {
   const [sectionId, setSectionId] = useState(null);
   const [sectionTitle, setSectionTitle] = useState('');
   const [sectionDesc, setSectionDesc] = useState('');
+  const [sectionImage, setSectionImage] = useState('');
+  const [isSubmittingSection, setIsSubmittingSection] = useState(false);
 
   const [isEditingTraining, setIsEditingTraining] = useState(false);
+  const [isSubmittingTraining, setIsSubmittingTraining] = useState(false);
   const [trainingId, setTrainingId] = useState(null);
   const [trainingSectionId, setTrainingSectionId] = useState('');
-  const [trainingDate, setTrainingDate] = useState('');
+  const [trainingDays, setTrainingDays] = useState([]);
   const [trainingTime, setTrainingTime] = useState('');
   const [trainingMax, setTrainingMax] = useState(10);
 
@@ -47,29 +50,37 @@ const Dashboard = () => {
   // Section CRUD
   const handleSectionSubmit = async (e) => {
     e.preventDefault();
+    setIsSubmittingSection(true);
     try {
-      if (isEditingSection) await api.put(`/sections/${sectionId}`, { name: sectionTitle, description: sectionDesc });
-      else await api.post('/sections', { name: sectionTitle, description: sectionDesc });
+      if (isEditingSection) await api.put(`/sections/${sectionId}`, { name: sectionTitle, description: sectionDesc, image: sectionImage });
+      else await api.post('/sections', { name: sectionTitle, description: sectionDesc, image: sectionImage });
       resetSectionForm(); fetchAll();
     } catch { setError('Failed to save section'); }
+    finally { setIsSubmittingSection(false); }
   };
-  const handleEditSection = (s) => { setIsEditingSection(true); setSectionId(s._id); setSectionTitle(s.name); setSectionDesc(s.description); window.scrollTo({ top: 0, behavior: 'smooth' }); };
+  const handleEditSection = (s) => { setIsEditingSection(true); setSectionId(s._id); setSectionTitle(s.name); setSectionDesc(s.description); setSectionImage(s.image); window.scrollTo({ top: 0, behavior: 'smooth' }); };
   const handleDeleteSection = async (id) => { if (window.confirm('Delete?')) { try { await api.delete(`/sections/${id}`); fetchAll(); } catch { setError('Failed to delete'); } } };
-  const resetSectionForm = () => { setIsEditingSection(false); setSectionId(null); setSectionTitle(''); setSectionDesc(''); };
+  const resetSectionForm = () => { setIsEditingSection(false); setSectionId(null); setSectionTitle(''); setSectionDesc(''); setSectionImage(''); };
 
   // Training CRUD
   const handleTrainingSubmit = async (e) => {
     e.preventDefault();
+    if (trainingDays.length === 0) {
+      setError('Please select at least one day');
+      return;
+    }
+    setIsSubmittingTraining(true);
     try {
-      const body = { section: trainingSectionId, date: trainingDate, time: trainingTime, maxParticipants: trainingMax };
+      const body = { section: trainingSectionId, days: trainingDays, time: trainingTime, maxParticipants: trainingMax };
       if (isEditingTraining) await api.put(`/trainings/${trainingId}`, body);
       else await api.post('/trainings', body);
       resetTrainingForm(); fetchAll();
     } catch { setError('Failed to save training'); }
+    finally { setIsSubmittingTraining(false); }
   };
-  const handleEditTraining = (tr) => { setIsEditingTraining(true); setTrainingId(tr._id); setTrainingSectionId(tr.section?._id || ''); setTrainingDate(tr.date); setTrainingTime(tr.time); setTrainingMax(tr.maxParticipants); window.scrollTo({ top: 0, behavior: 'smooth' }); };
+  const handleEditTraining = (tr) => { setIsEditingTraining(true); setTrainingId(tr._id); setTrainingSectionId(tr.section?._id || ''); setTrainingDays(tr.days || []); setTrainingTime(tr.time); setTrainingMax(tr.maxParticipants); window.scrollTo({ top: 0, behavior: 'smooth' }); };
   const handleDeleteTraining = async (id) => { if (window.confirm('Delete training?')) { try { await api.delete(`/trainings/${id}`); fetchAll(); } catch { setError('Failed to delete'); } } };
-  const resetTrainingForm = () => { setIsEditingTraining(false); setTrainingId(null); setTrainingSectionId(''); setTrainingDate(''); setTrainingTime(''); setTrainingMax(10); };
+  const resetTrainingForm = () => { setIsEditingTraining(false); setTrainingId(null); setTrainingSectionId(''); setTrainingDays([]); setTrainingTime(''); setTrainingMax(10); };
 
   const viewBookings = async (training) => {
     try {
@@ -120,11 +131,17 @@ const Dashboard = () => {
                 <input style={inputStyle} value={sectionTitle} onChange={e => setSectionTitle(e.target.value)} required />
               </div>
               <div className="form-group">
+                <label style={labelStyle}>Image URL</label>
+                <input style={inputStyle} type="url" value={sectionImage} onChange={e => setSectionImage(e.target.value)} required placeholder="https://..." />
+              </div>
+              <div className="form-group">
                 <label style={labelStyle}>{t('descLabel')}</label>
                 <textarea style={{ ...inputStyle, resize: 'vertical' }} rows="4" value={sectionDesc} onChange={e => setSectionDesc(e.target.value)} required />
               </div>
               <div style={{ display: 'flex', gap: '0.75rem' }}>
-                <button type="submit" className="btn btn-primary" style={{ flex: 1 }}>{isEditingSection ? t('update') : t('create')}</button>
+                <button type="submit" disabled={isSubmittingSection} className="btn btn-primary" style={{ flex: 1, opacity: isSubmittingSection ? 0.7 : 1 }}>
+                  {isSubmittingSection ? t('loading') : (isEditingSection ? t('update') : t('create'))}
+                </button>
                 {isEditingSection && <button type="button" onClick={resetSectionForm} className="btn btn-outline" style={{ flex: 1 }}>{t('cancel')}</button>}
               </div>
             </form>
@@ -164,7 +181,22 @@ const Dashboard = () => {
               </div>
               <div className="form-group">
                 <label style={labelStyle}>{t('dateLabel')}</label>
-                <input type="date" style={inputStyle} value={trainingDate} onChange={e => setTrainingDate(e.target.value)} required />
+                <div style={{ display: 'flex', gap: '0.4rem', flexWrap: 'wrap' }}>
+                  {['mon', 'tue', 'wed', 'thu', 'fri', 'sat', 'sun'].map(day => (
+                    <label key={day} style={{ display: 'flex', alignItems: 'center', gap: '0.3rem', background: 'rgba(255,255,255,0.05)', padding: '0.4rem 0.6rem', borderRadius: '4px', cursor: 'pointer', border: trainingDays.includes(day) ? '1px solid var(--primary-light)' : '1px solid transparent' }}>
+                      <input 
+                        type="checkbox" 
+                        checked={trainingDays.includes(day)}
+                        onChange={(e) => {
+                          if (e.target.checked) setTrainingDays([...trainingDays, day]);
+                          else setTrainingDays(trainingDays.filter(d => d !== day));
+                        }}
+                        style={{ display: 'none' }}
+                      />
+                      <span style={{ fontSize: '0.85rem', color: trainingDays.includes(day) ? 'var(--primary-light)' : 'var(--text-muted)' }}>{t(day)}</span>
+                    </label>
+                  ))}
+                </div>
               </div>
               <div className="form-group">
                 <label style={labelStyle}>{t('timeLabel')}</label>
@@ -175,7 +207,9 @@ const Dashboard = () => {
                 <input type="number" style={inputStyle} value={trainingMax} onChange={e => setTrainingMax(Number(e.target.value))} required min="1" />
               </div>
               <div style={{ display: 'flex', gap: '0.75rem' }}>
-                <button type="submit" className="btn btn-primary" style={{ flex: 1 }}>{isEditingTraining ? t('update') : t('schedule')}</button>
+                <button type="submit" disabled={isSubmittingTraining} className="btn btn-primary" style={{ flex: 1, opacity: isSubmittingTraining ? 0.7 : 1 }}>
+                  {isSubmittingTraining ? t('loading') : (isEditingTraining ? t('update') : t('schedule'))}
+                </button>
                 {isEditingTraining && <button type="button" onClick={resetTrainingForm} className="btn btn-outline" style={{ flex: 1 }}>{t('cancel')}</button>}
               </div>
             </form>
@@ -190,7 +224,7 @@ const Dashboard = () => {
               >
                 <div>
                   <span className="badge badge-trainer" style={{ marginBottom: '0.3rem' }}>{tr.section?.name}</span>
-                  <div style={{ fontWeight: 600 }}>{tr.date} {t('at')} {tr.time}</div>
+                  <div style={{ fontWeight: 600 }}>{tr.days?.map(d => t(d)).join(', ')} {t('at')} {tr.time}</div>
                 </div>
                 <div style={{ display: 'flex', gap: '0.6rem' }}>
                   <button onClick={() => navigate(`/attendance/${tr._id}`)} className="btn btn-primary" style={{ padding: '0.4rem 0.8rem', fontSize: '0.8rem', display: 'flex', alignItems: 'center', gap: '0.4rem' }}>

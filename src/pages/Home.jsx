@@ -4,36 +4,6 @@ import { useLang } from '../context/LangContext';
 import api from '../services/api';
 import { Calendar, Users, Star, Zap, Trophy, Heart, ArrowRight } from 'lucide-react';
 
-const SECTION_IMAGES = {
-  default: 'https://images.unsplash.com/photo-1534438327276-14e5300c3a48?auto=format&fit=crop&w=600&q=80',
-  boxing: 'https://images.unsplash.com/photo-1549719386-74dfcbf7dbed?auto=format&fit=crop&w=600&q=80',
-  бокс: 'https://images.unsplash.com/photo-1549719386-74dfcbf7dbed?auto=format&fit=crop&w=600&q=80',
-  yoga: 'https://images.unsplash.com/photo-1575052814086-f385e2e2ad1b?auto=format&fit=crop&w=600&q=80',
-  йога: 'https://images.unsplash.com/photo-1575052814086-f385e2e2ad1b?auto=format&fit=crop&w=600&q=80',
-  swimming: 'https://images.unsplash.com/photo-1530549387789-4c1017266635?auto=format&fit=crop&w=600&q=80',
-  плавание: 'https://images.unsplash.com/photo-1530549387789-4c1017266635?auto=format&fit=crop&w=600&q=80',
-  football: 'https://images.unsplash.com/photo-1431324155629-1a6deb1dec8d?auto=format&fit=crop&w=600&q=80',
-  футбол: 'https://images.unsplash.com/photo-1431324155629-1a6deb1dec8d?auto=format&fit=crop&w=600&q=80',
-  basketball: 'https://images.unsplash.com/photo-1546519638405-a9abae6cc16a?auto=format&fit=crop&w=600&q=80',
-  баскетбол: 'https://images.unsplash.com/photo-1546519638405-a9abae6cc16a?auto=format&fit=crop&w=600&q=80',
-  tennis: 'https://images.unsplash.com/photo-1554068865-24cecd4e34b8?auto=format&fit=crop&w=600&q=80',
-  теннис: 'https://images.unsplash.com/photo-1554068865-24cecd4e34b8?auto=format&fit=crop&w=600&q=80',
-  running: 'https://images.unsplash.com/photo-1461897104016-0b3b00cc81ee?auto=format&fit=crop&w=600&q=80',
-  бег: 'https://images.unsplash.com/photo-1461897104016-0b3b00cc81ee?auto=format&fit=crop&w=600&q=80',
-  crossfit: 'https://images.unsplash.com/photo-1552674605-db6ffd4facb5?auto=format&fit=crop&w=600&q=80',
-  кроссфит: 'https://images.unsplash.com/photo-1552674605-db6ffd4facb5?auto=format&fit=crop&w=600&q=80',
-  волейбол: 'https://images.unsplash.com/photo-1612872087720-bb876e2e67d1?auto=format&fit=crop&w=600&q=80',
-  volleyball: 'https://images.unsplash.com/photo-1612872087720-bb876e2e67d1?auto=format&fit=crop&w=600&q=80',
-};
-
-export const getSectionImage = (name = '') => {
-  const lower = name.toLowerCase();
-  for (const key of Object.keys(SECTION_IMAGES)) {
-    if (lower.includes(key)) return SECTION_IMAGES[key];
-  }
-  return SECTION_IMAGES.default;
-};
-
 const TRAINERS_STATIC = [
   { name: 'Алексей Морозов', sport: 'Бокс и ММА', rating: 4.9, sessions: 240, img: 'https://images.unsplash.com/photo-1571019613454-1cb2f99b2d8b?auto=format&fit=crop&w=300&q=80' },
   { name: 'Айгерим Сейткали', sport: 'Йога и велнес', rating: 4.8, sessions: 310, img: 'https://images.unsplash.com/photo-1594381898411-846e7d193883?auto=format&fit=crop&w=300&q=80' },
@@ -168,7 +138,7 @@ const SectionPreviewCard = ({ sec, i, t }) => (
     onMouseLeave={e => { e.currentTarget.style.transform='translateY(0)'; e.currentTarget.style.boxShadow='none'; }}
   >
     <div style={{ position: 'relative', height: 200, overflow: 'hidden' }}>
-      <img src={getSectionImage(sec.name)} alt={sec.name} style={{ width: '100%', height: '100%', objectFit: 'cover', transition: 'transform 0.4s' }}
+      <img src={sec.image || 'https://images.unsplash.com/photo-1534438327276-14e5300c3a48?auto=format&fit=crop&w=600&q=80'} alt={sec.name} style={{ width: '100%', height: '100%', objectFit: 'cover', transition: 'transform 0.4s' }}
         onMouseEnter={e => e.target.style.transform='scale(1.05)'}
         onMouseLeave={e => e.target.style.transform='scale(1)'}
       />

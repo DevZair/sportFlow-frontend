@@ -141,6 +141,15 @@ export const translations = {
     status: 'Статус',
     backToDashboard: 'Назад',
     noReason: 'Без причины',
+
+    // Days of week
+    mon: 'Пн',
+    tue: 'Вт',
+    wed: 'Ср',
+    thu: 'Чт',
+    fri: 'Пт',
+    sat: 'Сб',
+    sun: 'Вс',
   },
 
   kz: {
@@ -285,5 +294,14 @@ export const translations = {
     status: 'Күйі',
     backToDashboard: 'Артқа',
     noReason: 'Себепсіз',
+
+    // Days of week
+    mon: 'Дс',
+    tue: 'Сс',
+    wed: 'Ср',
+    thu: 'Бс',
+    fri: 'Жм',
+    sat: 'Сн',
+    sun: 'Жс',
   },
 };

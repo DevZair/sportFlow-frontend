@@ -2,12 +2,11 @@ import React from 'react';
 import { ArrowRight } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { useLang } from '../context/LangContext';
-import { getSectionImage } from '../pages/Home';
 
 const SectionCard = ({ section, isAdmin, onEdit, onDelete }) => {
   const navigate = useNavigate();
   const { t } = useLang();
-  const img = getSectionImage(section.name);
+  const img = section.image || 'https://images.unsplash.com/photo-1534438327276-14e5300c3a48?auto=format&fit=crop&w=600&q=80';
 
   return (
     <div style={{

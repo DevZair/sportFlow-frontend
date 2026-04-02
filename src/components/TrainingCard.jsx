@@ -1,11 +1,10 @@
 import React from 'react';
 import { Calendar, Clock, Users, User, LogIn } from 'lucide-react';
-import { getSectionImage } from '../pages/Home';
 import { useLang } from '../context/LangContext';
 
-const TrainingCard = ({ training, onBook, isAdmin, onDelete, isBooked, userInfo }) => {
+const TrainingCard = ({ training, onBook, isAdmin, onDelete, isBooked, userInfo, isBookingLoading }) => {
   const { t } = useLang();
-  const img = getSectionImage(training.section?.name || '');
+  const img = training.section?.image || 'https://images.unsplash.com/photo-1517836357463-d25dfeac3438?auto=format&fit=crop&w=600&q=80';
 
   return (
     <div style={{
@@ -38,21 +37,25 @@ const TrainingCard = ({ training, onBook, isAdmin, onDelete, isBooked, userInfo 
 
       <div style={{ padding: '1.25rem', flex: 1, display: 'flex', flexDirection: 'column', gap: '1rem' }}>
         <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '0.6rem' }}>
-          <InfoRow icon={<Calendar size={14} />} text={training.date} />
+          <InfoRow icon={<Calendar size={14} />} text={training.days?.map(d => t(d)).join(', ')} />
           <InfoRow icon={<Clock size={14} />} text={training.time} />
           <InfoRow icon={<User size={14} />} text={training.trainer?.name || '—'} />
           <InfoRow icon={<Users size={14} />} text={`${t('maxParticipants')} ${training.maxParticipants}`} />
         </div>
 
-        {!isAdmin && (
+        {!isAdmin && userInfo?.role !== 'trainer' && (
           <button
             onClick={() => onBook(training._id)}
-            disabled={isBooked}
+            disabled={isBooked || isBookingLoading}
             className={isBooked ? 'btn btn-outline' : 'btn btn-primary'}
-            style={{ width: '100%', opacity: isBooked ? 0.6 : 1 }}
+            style={{ width: '100%', opacity: (isBooked || isBookingLoading) ? 0.6 : 1 }}
           >
-            {!userInfo && <LogIn size={16} />}
-            {isBooked ? t('alreadyBooked') : userInfo ? t('bookNow') : t('loginToBook')}
+            {isBookingLoading ? t('loading') : (
+              <>
+                {!userInfo && <LogIn size={16} />}
+                {isBooked ? t('alreadyBooked') : userInfo ? t('bookNow') : t('loginToBook')}
+              </>
+            )}
           </button>
         )}
       </div>

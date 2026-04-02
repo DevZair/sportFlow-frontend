@@ -11,6 +11,7 @@ const Schedule = () => {
   const [trainings, setTrainings] = useState([]);
   const [myBookings, setMyBookings] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [loadingBookings, setLoadingBookings] = useState({});
   const [error, setError] = useState('');
   const [success, setSuccess] = useState('');
   const { userInfo } = useContext(AuthContext);
@@ -22,7 +23,7 @@ const Schedule = () => {
   const fetchData = async () => {
     setLoading(true);
     try {
-      const { data: td } = await api.get('/trainings');
+      const { data: td } = await api.get('/trainings?available=true');
       setTrainings(td);
       if (userInfo?.role === 'student') {
         const { data: bd } = await api.get('/bookings/me');
@@ -38,12 +39,15 @@ const Schedule = () => {
   const handleBook = async (trainingId) => {
     if (!userInfo) { navigate('/register'); return; }
     try {
+      setLoadingBookings(prev => ({ ...prev, [trainingId]: true }));
       setError(''); setSuccess('');
       await api.post('/bookings', { trainingId });
       setSuccess(t('bookedSuccess'));
       fetchData();
     } catch (err) {
       setError(err.response?.data?.message || 'Error');
+    } finally {
+      setLoadingBookings(prev => ({ ...prev, [trainingId]: false }));
     }
   };
 
@@ -71,7 +75,7 @@ const Schedule = () => {
         <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(320px, 1fr))', gap: '1.75rem' }}>
           {trainings.map((tr, i) => (
             <div key={tr._id} className={`animate-fade-up delay-${(i % 4) + 1}`}>
-              <TrainingCard training={tr} onBook={handleBook} isBooked={myBookings.includes(tr._id)} userInfo={userInfo} t={t} />
+              <TrainingCard training={tr} onBook={handleBook} isBooked={myBookings.includes(tr._id)} userInfo={userInfo} t={t} isBookingLoading={loadingBookings[tr._id]} />
             </div>
           ))}
         </div>
