@@ -298,3 +298,27 @@ button{cursor:pointer;font-family:inherit;border:none;outline:none;}
   bottom: -150px; right: -150px;
   animation: float 10s ease-in-out infinite reverse;
 }
+
+/* --- Mobile Responsiveness --- */
+@media (max-width: 900px) {
+  .nav-desktop-links { display: none !important; }
+  .mobile-menu-btn { display: inline-flex !important; }
+  .mobile-menu-content { display: flex !important; }
+}
+
+@media (max-width: 768px) {
+  .hide-on-mobile { display: none !important; }
+  .stack-on-mobile { flex-direction: column !important; align-items: stretch !important; gap: 1rem !important; }
+  .w-full-mobile { width: 100% !important; justify-content: center !important; }
+  div[style*="padding: 5rem 1rem 4rem"] { padding: 3rem 1rem !important; }
+  .modal-content { width: 95% !important; margin: 1rem !important; }
+  .table-responsive { overflow-x: auto; width: 100%; display: block; }
+  .card { padding: 1rem !important; }
+  .section-title { font-size: 2rem !important; }
+  th, td { padding: 0.75rem 0.5rem !important; font-size: 0.85rem !important; }
+}
+
+@media (min-width: 901px) {
+  .mobile-menu-btn { display: none !important; }
+  .mobile-menu-container { display: none !important; }
+}

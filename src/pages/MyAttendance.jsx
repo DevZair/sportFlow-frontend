@@ -68,7 +68,7 @@ const MyAttendance = () => {
 
       {/* Rate bar */}
       {total > 0 && (
-        <div className="glass" style={{ padding: '1.25rem 1.5rem', marginBottom: '2.5rem', display: 'flex', alignItems: 'center', gap: '1.5rem' }}>
+        <div className="glass stack-on-mobile" style={{ padding: '1.25rem 1.5rem', marginBottom: '2.5rem', display: 'flex', alignItems: 'center', gap: '1.5rem' }}>
           <div style={{ flex: 1 }}>
             <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '0.85rem', color: 'var(--text-muted)', marginBottom: '0.5rem' }}>
               <span>{t('attendanceRate')}</span>

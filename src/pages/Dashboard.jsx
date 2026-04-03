@@ -150,7 +150,7 @@ const Dashboard = () => {
           {/* Section List */}
           <div style={{ display: 'flex', flexDirection: 'column', gap: '0.875rem' }}>
             {sections.map(sec => (
-              <div key={sec._id} style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '1rem 1.25rem', background: 'rgba(255,255,255,0.03)', border: '1px solid rgba(255,255,255,0.07)', borderRadius: 'var(--radius)', transition: 'border-color 0.2s' }}
+              <div key={sec._id} className="stack-on-mobile" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '1rem 1.25rem', background: 'rgba(255,255,255,0.03)', border: '1px solid rgba(255,255,255,0.07)', borderRadius: 'var(--radius)', transition: 'border-color 0.2s' }}
                 onMouseEnter={e => e.currentTarget.style.borderColor = 'rgba(99,102,241,0.3)'}
                 onMouseLeave={e => e.currentTarget.style.borderColor = 'rgba(255,255,255,0.07)'}
               >
@@ -218,7 +218,7 @@ const Dashboard = () => {
           {/* Training List */}
           <div style={{ display: 'flex', flexDirection: 'column', gap: '0.875rem' }}>
             {trainings.map(tr => (
-              <div key={tr._id} style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '1rem 1.25rem', background: 'rgba(255,255,255,0.03)', border: '1px solid rgba(255,255,255,0.07)', borderRadius: 'var(--radius)', transition: 'border-color 0.2s' }}
+              <div key={tr._id} className="stack-on-mobile" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '1rem 1.25rem', background: 'rgba(255,255,255,0.03)', border: '1px solid rgba(255,255,255,0.07)', borderRadius: 'var(--radius)', transition: 'border-color 0.2s' }}
                 onMouseEnter={e => e.currentTarget.style.borderColor = 'rgba(99,102,241,0.3)'}
                 onMouseLeave={e => e.currentTarget.style.borderColor = 'rgba(255,255,255,0.07)'}
               >

@@ -36,7 +36,7 @@ const MyBookings = () => {
       ) : (
         <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
           {bookings.map((booking) => (
-            <div key={booking._id} className="card animate-fade-up" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '1.25rem 1.5rem', border: '1px solid rgba(255,255,255,0.06)' }}>
+            <div key={booking._id} className="card animate-fade-up stack-on-mobile" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '1.25rem 1.5rem', border: '1px solid rgba(255,255,255,0.06)' }}>
               <div style={{ display: 'flex', gap: '2rem', alignItems: 'center', flexWrap: 'wrap' }}>
                 <div>
                   <span className="badge badge-student" style={{ marginBottom: '0.25rem' }}>{booking.training?.section?.name}</span>

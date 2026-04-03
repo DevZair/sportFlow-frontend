@@ -2,7 +2,7 @@ import React, { useContext, useState } from 'react';
 import { Link, useNavigate, useLocation } from 'react-router-dom';
 import { AuthContext } from '../context/AuthContext';
 import { useLang } from '../context/LangContext';
-import { Dumbbell, LogOut, LayoutDashboard, Calendar, CheckSquare } from 'lucide-react';
+import { Dumbbell, LogOut, LayoutDashboard, Calendar, CheckSquare, Menu, X } from 'lucide-react';
 
 const NAV_LINKS_KEYS = [
   { to: '/', labelKey: 'home' },
@@ -15,6 +15,7 @@ const Navbar = () => {
   const { lang, switchLang, t } = useLang();
   const navigate = useNavigate();
   const location = useLocation();
+  const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
 
   const handleLogout = () => { logout(); navigate('/login'); };
 
@@ -35,7 +36,7 @@ const Navbar = () => {
         </Link>
 
         {/* Desktop Nav Links */}
-        <div style={{ display: 'flex', alignItems: 'center', gap: '0.25rem' }}>
+        <div className="nav-desktop-links" style={{ display: 'flex', alignItems: 'center', gap: '0.25rem' }}>
           {NAV_LINKS_KEYS.map(link => (
             <Link key={link.to} to={link.to} style={{
               padding: '0.4rem 1rem',
@@ -49,8 +50,8 @@ const Navbar = () => {
           ))}
         </div>
 
-        {/* Right side */}
-        <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem' }}>
+        {/* Right side Desktop */}
+        <div className="nav-desktop-links" style={{ display: 'flex', alignItems: 'center', gap: '0.75rem' }}>
           {/* Language switcher */}
           <div style={{ display: 'flex', gap: '2px', background: 'rgba(255,255,255,0.06)', borderRadius: '0.5rem', padding: '3px' }}>
             {['ru', 'kz'].map(l => (
@@ -100,7 +101,70 @@ const Navbar = () => {
             </>
           )}
         </div>
+
+        {/* Mobile Menu Button */}
+        <button 
+          className="mobile-menu-btn btn-icon" 
+          onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
+        >
+          {isMobileMenuOpen ? <X size={24} /> : <Menu size={24} />}
+        </button>
       </div>
+
+      {/* Mobile Menu Dropdown */}
+      {isMobileMenuOpen && (
+        <div className="mobile-menu-container" style={{
+          position: 'absolute', top: '100%', left: 0, right: 0,
+          background: 'var(--bg)', borderBottom: '1px solid var(--border)',
+          padding: '1rem', display: 'flex', flexDirection: 'column', gap: '1rem',
+          boxShadow: 'var(--shadow)'
+        }}>
+          {NAV_LINKS_KEYS.map(link => (
+            <Link key={link.to} to={link.to} onClick={() => setIsMobileMenuOpen(false)} style={{
+              padding: '0.75rem 1rem', borderRadius: 'var(--radius-sm)',
+              color: location.pathname === link.to ? 'var(--primary-light)' : 'var(--text-muted)',
+              background: location.pathname === link.to ? 'rgba(99,102,241,0.1)' : 'rgba(255,255,255,0.03)',
+            }}>{t(link.labelKey)}</Link>
+          ))}
+          
+          <div style={{ height: '1px', background: 'var(--border)' }} />
+          
+          <div style={{ display: 'flex', gap: '0.5rem' }}>
+             {['ru', 'kz'].map(l => (
+               <button key={l} onClick={() => { switchLang(l); setIsMobileMenuOpen(false); }} className={`btn ${lang === l ? 'btn-primary' : 'btn-outline'}`} style={{ flex: 1, padding: '0.5rem' }}>
+                 {l.toUpperCase()}
+               </button>
+             ))}
+          </div>
+
+          {userInfo ? (
+            <div style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem' }}>
+              <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem', marginBottom: '0.5rem', padding: '0.5rem' }}>
+                <div style={{ width: '2rem', height: '2rem', background: 'linear-gradient(135deg,var(--primary),var(--accent))', borderRadius: '50%', display: 'flex', alignItems: 'center', justifyContent: 'center', fontWeight: 700 }}>
+                  {userInfo.name.charAt(0).toUpperCase()}
+                </div>
+                <span>{userInfo.name}</span>
+              </div>
+              {userInfo.role === 'trainer' ? (
+                <Link to="/dashboard" onClick={() => setIsMobileMenuOpen(false)} className="btn btn-outline"><LayoutDashboard size={16}/> {t('dashboard')}</Link>
+              ) : (
+                <>
+                  <Link to="/my-bookings" onClick={() => setIsMobileMenuOpen(false)} className="btn btn-outline"><Calendar size={16}/> {t('myBookings')}</Link>
+                  <Link to="/my-attendance" onClick={() => setIsMobileMenuOpen(false)} className="btn btn-outline"><CheckSquare size={16}/> {t('myAttendance')}</Link>
+                </>
+              )}
+              <button onClick={() => { setIsMobileMenuOpen(false); handleLogout(); }} className="btn btn-danger" style={{ marginTop: '0.5rem' }}>
+                <LogOut size={16} /> {t('logout')}
+              </button>
+            </div>
+          ) : (
+            <div style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem' }}>
+              <Link to="/login" onClick={() => setIsMobileMenuOpen(false)} className="btn btn-outline">{t('login')}</Link>
+              <Link to="/register" onClick={() => setIsMobileMenuOpen(false)} className="btn btn-primary">{t('getStarted')}</Link>
+            </div>
+          )}
+        </div>
+      )}
     </nav>
   );
 };
